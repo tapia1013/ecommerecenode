@@ -1,1 +1,1 @@
-// comment
+console.log('Hi there');
