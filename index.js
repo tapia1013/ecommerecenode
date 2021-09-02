@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 
 // bodyparses everywhere in the app so we wont have to keep writing it
-app.use(bodyParse.urlendcoded({ extended: true }));
+app.use(bodyParse.urlencoded({ extended: true }));
 
 
 app.get('/', (req, res) => {
@@ -60,8 +60,6 @@ app.post('/', (req, res) => {
   console.log(req.body);
   res.send('Account created!!!')
 });
-
-
 
 
 
