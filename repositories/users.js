@@ -86,24 +86,61 @@ class UserRepositories {
   }
 
 
+
+
+  async getOneBy(filters) {
+    const records = await this.getAll();
+
+    for (let record of records) {
+      let found = true;
+
+      for (let key in filters) {
+        if (record[key] !== filters[key]) {
+          found = false;
+        }
+      }
+
+      if (found) {
+        return record;
+      }
+    }
+
+  }
+
+
+
 }
 
 
 
 
 
-const test = async () => {
-  const repo = new UserRepositories('users.json');
+// const test = async () => {
+//   const repo = new UserRepositories('users.json');
 
-  // await repo.create({ email: 'test@test.com', password: 'password' })
-  // const users = await repo.getAll();
+//   // await repo.create({ email: 'test@test.com', password: 'password' })
+//   // const users = await repo.getAll();
 
-  // const user = await repo.getOne('qwqwqw2');
-  // console.log(user);
+//   // const user = await repo.getOne('qwqwqw2');
+//   // console.log(user);
 
-  // await repo.delete('5a9f9944');
+//   // await repo.delete('5a9f9944');
 
-  // await repo.update('9969d28f', { password: 'mypassword' })
+//   // await repo.update('9969d28f', { password: 'mypassword' })
 
-}
-test();
+//   const user = await repo.getOneBy({
+//     email: 'test@test.com',
+//     password: 'mypassword'
+//   })
+//   console.log(user);
+// }
+// test();
+
+
+
+
+
+
+
+// exporting this file, new UserRepo is an instance so we cna avoid issues trying to import in other files
+module.exports = new UserRepositories('users.json');
