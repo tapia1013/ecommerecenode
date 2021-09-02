@@ -1,5 +1,6 @@
 const fs = require('fs');
 const crypto = require('crypto');
+const { throws } = require('assert');
 
 class UserRepositories {
   constructor(filename) {
@@ -69,7 +70,20 @@ class UserRepositories {
   }
 
 
+  async update(id, attrs) {
+    const records = await this.getAll();
+    const record = records.find(record => record.id === id);
 
+    if (!record) {
+      throw new Error(`Record with id ${id} not found`)
+    }
+    // record = {email: 'test@s.com'}
+    // attrs = {pw: 'mypw'}
+    Object.assign(record, attrs) // record === {email, pw}
+
+    await this.writeAll(records)
+
+  }
 
 
 }
@@ -87,7 +101,9 @@ const test = async () => {
   // const user = await repo.getOne('qwqwqw2');
   // console.log(user);
 
-  await repo.delete('5a9f9944');
+  // await repo.delete('5a9f9944');
+
+  // await repo.update('9969d28f', { password: 'mypassword' })
 
 }
 test();
