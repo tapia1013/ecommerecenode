@@ -1,6 +1,9 @@
 const fs = require('fs');
 const crypto = require('crypto');
-const { throws } = require('assert');
+const util = require('util');
+
+const scrypt = util.promisify(crypto.scrypt);
+
 
 class UserRepositories {
   constructor(filename) {
@@ -32,17 +35,67 @@ class UserRepositories {
   }
 
 
+  /**
+  *         salting + hashing password
+  *
+  *   'mypassword'           'asadlasdkkl' Salt
+  *       |                       |
+  *       --------------------------
+  *                   |
+  *          #hashing algorithm
+  *                   |
+  *      89sd9298634j23jn34ksl340823nd23018d
+  *
+  *
+  *
+  */
 
   async create(attrs) {
+    // attrs always has {email: "", password:""}
     attrs.id = this.randomId();
+
+
+
+    // hash and salt password
+    const salt = crypto.randomBytes(8).toString('hex');
+    const buf = await scrypt(attrs.password, salt, 64)
+
+
 
     // {email: 'asdsd@m.com', pw: 'pw'}
     const records = await this.getAll();
-    records.push(attrs);
+
+    const record = {
+      ...attrs,
+      password: `${buf.toString('hex')}.${salt}`
+    }
+
+    records.push(record);
+
+
 
     await this.writeAll(records);
 
-    return attrs;
+    return record;
+  }
+
+
+
+  // compare passwords after hash and salt
+  async comparePasswords(saved, supplied) {
+    // Saved -> password saved in our database('hashed.salt');
+    // Supplied -> password given to us by user trying to sign in.
+
+
+    // const result = saved.split('.');
+    // const hashed = result[0];
+    // const salt = result[1];
+    const [hashed, salt] = saved.split('.');
+    const hashedSuppliedBuf = await scrypt(supplied, salt, 64);
+
+    // add .toString() cause scrypt returns a buffer[]
+    return hashed === hashedSuppliedBuf.toString('hex');
+
   }
 
 
@@ -108,6 +161,7 @@ class UserRepositories {
     }
 
   }
+
 
 
 
