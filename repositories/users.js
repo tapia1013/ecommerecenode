@@ -47,7 +47,11 @@ class UserRepositories {
   *      89sd9298634j23jn34ksl340823nd23018d
   *
   *
-  *
+  * NODE JS
+  * 
+  * 
+  * 
+  * 
   */
 
   async create(attrs) {
@@ -200,3 +204,7 @@ class UserRepositories {
 
 // exporting this file, new UserRepo is an instance so we cna avoid issues trying to import in other files
 module.exports = new UserRepositories('users.json');
+
+
+
+// EXPORT THE MODULES
