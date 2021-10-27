@@ -15,7 +15,7 @@ router.get('/signup', (req, res) => {
 
 
 
-//
+//  
 
 // we put the middleware inbetween '/',HERE,()=>{}
 router.post('/signup', async (req, res) => {
