@@ -31,5 +31,15 @@
     "email": "test69@test.com",
     "password": "efffbfa2281422ec863f6ae308886325fcd5610a4b21dc4a4a8a41359ce38073a1e902e804e74bf74843999ebcce4fa05f926c4d61cfbef2886e43cb435adb97.ac25da4965f4c219",
     "id": "dc21b82a"
+  },
+  {
+    "email": "@asd",
+    "password": "75a25f6f03ac4a69605e1d20ce01afd2d8f7ec4cffe259bc5e6142d67b1596537cddbb7bef40916e532d5de1bd6fb2d7773ab85fdfa0e7b0868a547f00479c73.780006118397e7bc",
+    "id": "8f2424b2"
+  },
+  {
+    "email": "test123@test.com",
+    "password": "8710416f398a3102b3bf83a04f4a579ff2e80da084414a5a4d73e0effa4ec4a6beae923c53eba838d6c151324a4d0f1810fe5da47f36caa8fe5e54be631fe886.53ea81c8e9b53515",
+    "id": "4e42621a"
   }
 ]

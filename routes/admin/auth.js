@@ -1,6 +1,6 @@
 // sub router for const app = express()
 const express = require('express');
-const { check } = require('express-validator');
+const { check, validationResult } = require('express-validator');
 
 const usersRepo = require('../../repositories/users');
 const signupTemplate = require('../../views/admin/auth/signup');
@@ -17,23 +17,39 @@ router.get('/signup', (req, res) => {
 
 // we put the middleware inbetween '/',HERE,()=>{}
 router.post('/signup', [
-  check('email').isEmail(),
-  check('password').isLength(),
+  // FIRST WE SANITZE THEN WE VALIDATE
+  check('email')
+    .trim()
+    .normalizeEmail()
+    .isEmail()
+    .withMessage('Must be a valid email')
+    .custom(async (email) => {
+      const existingUser = await usersRepo.getOneBy({ email });
+      if (existingUser) {
+        throw new Error('Email in use');
+      }
+    }),
+  check('password')
+    .trim()
+    .isLength({ min: 4, max: 20 })
+    .withMessage('Must be between 4 and 20 characters'),
   check('passwordConfirmation')
+    .trim()
+    .isLength({ min: 4, max: 20 })
+    .withMessage('Must be between 4 and 20 characters')
+    .custom((passwordConfirmation, { req }) => {
+      if (passwordConfirmation !== req.password.password) {
+        throw new Error('Passwords must match');
+      }
+    })
 ], async (req, res) => {
   // console.log(req.body);
 
+  // expressValidator errors
+  const errors = validationResult(req)
+  console.log(errors);
+
   const { email, password, passwordConfirmation } = req.body;
-
-  const existingUser = await usersRepo.getOneBy({ email });
-
-  if (existingUser) {
-    return res.send('Email in use');
-  }
-
-  if (password !== passwordConfirmation) {
-    return res.send('Passwords must match');
-  }
 
   // Create a user in our user repo to represent this person
   const user = await usersRepo.create({ email: email, password: password });
@@ -41,7 +57,6 @@ router.post('/signup', [
   // Store the ID of that user inside the user coookie
   // req.session === {} // Added by cookie session!
   req.session.userId = user.id;
-
 
   res.send('Account created!!!');
 });
