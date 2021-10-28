@@ -1,5 +1,7 @@
 // sub router for const app = express()
 const express = require('express');
+const { check } = require('express-validator');
+
 const usersRepo = require('../../repositories/users');
 const signupTemplate = require('../../views/admin/auth/signup');
 const signinTemplate = require('../../views/admin/auth/signin');
@@ -13,12 +15,12 @@ router.get('/signup', (req, res) => {
 
 
 
-
-
-//  
-
 // we put the middleware inbetween '/',HERE,()=>{}
-router.post('/signup', async (req, res) => {
+router.post('/signup', [
+  check('email').isEmail(),
+  check('password').isLength(),
+  check('passwordConfirmation')
+], async (req, res) => {
   // console.log(req.body);
 
   const { email, password, passwordConfirmation } = req.body;
