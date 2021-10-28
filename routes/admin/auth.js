@@ -5,6 +5,7 @@ const { check, validationResult } = require('express-validator');
 const usersRepo = require('../../repositories/users');
 const signupTemplate = require('../../views/admin/auth/signup');
 const signinTemplate = require('../../views/admin/auth/signin');
+const { requireEmail, requirePassword, requirePasswordConfirmation } = require('./validators');
 
 const router = express.Router();
 
@@ -16,50 +17,29 @@ router.get('/signup', (req, res) => {
 
 
 // we put the middleware inbetween '/',HERE,()=>{}
-router.post('/signup', [
-  // FIRST WE SANITZE THEN WE VALIDATE
-  check('email')
-    .trim()
-    .normalizeEmail()
-    .isEmail()
-    .withMessage('Must be a valid email')
-    .custom(async (email) => {
-      const existingUser = await usersRepo.getOneBy({ email });
-      if (existingUser) {
-        throw new Error('Email in use');
-      }
-    }),
-  check('password')
-    .trim()
-    .isLength({ min: 4, max: 20 })
-    .withMessage('Must be between 4 and 20 characters'),
-  check('passwordConfirmation')
-    .trim()
-    .isLength({ min: 4, max: 20 })
-    .withMessage('Must be between 4 and 20 characters')
-    .custom((passwordConfirmation, { req }) => {
-      if (passwordConfirmation !== req.password.password) {
-        throw new Error('Passwords must match');
-      }
-    })
-], async (req, res) => {
-  // console.log(req.body);
+router.post('/signup',
+  [
+    // FIRST WE SANITZE THEN WE VALIDATE
+    requireEmail,
+    requirePassword,
+    requirePasswordConfirmation
+  ],
+  async (req, res) => {
+    // expressValidator errors
+    const errors = validationResult(req)
+    console.log(errors);
 
-  // expressValidator errors
-  const errors = validationResult(req)
-  console.log(errors);
+    const { email, password, passwordConfirmation } = req.body;
 
-  const { email, password, passwordConfirmation } = req.body;
+    // Create a user in our user repo to represent this person
+    const user = await usersRepo.create({ email: email, password: password });
 
-  // Create a user in our user repo to represent this person
-  const user = await usersRepo.create({ email: email, password: password });
+    // Store the ID of that user inside the user coookie
+    // req.session === {} // Added by cookie session!
+    req.session.userId = user.id;
 
-  // Store the ID of that user inside the user coookie
-  // req.session === {} // Added by cookie session!
-  req.session.userId = user.id;
-
-  res.send('Account created!!!');
-});
+    res.send('Account created!!!');
+  });
 
 
 
