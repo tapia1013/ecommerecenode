@@ -5,7 +5,13 @@ const { check, validationResult } = require('express-validator');
 const usersRepo = require('../../repositories/users');
 const signupTemplate = require('../../views/admin/auth/signup');
 const signinTemplate = require('../../views/admin/auth/signin');
-const { requireEmail, requirePassword, requirePasswordConfirmation } = require('./validators');
+const {
+  requireEmail,
+  requirePassword,
+  requirePasswordConfirmation,
+  requireEmailExists,
+  requireValidPasswordForUser
+} = require('./validators');
 
 const router = express.Router();
 
@@ -17,7 +23,8 @@ router.get('/signup', (req, res) => {
 
 
 // we put the middleware inbetween '/',HERE,()=>{}
-router.post('/signup',
+router.post(
+  '/signup',
   [
     // FIRST WE SANITZE THEN WE VALIDATE
     requireEmail,
@@ -27,7 +34,12 @@ router.post('/signup',
   async (req, res) => {
     // expressValidator errors
     const errors = validationResult(req)
-    console.log(errors);
+    // console.log(errors);
+
+    if (!errors.isEmpty()) {
+      return res.send(signupTemplate({ req, errors }));
+    }
+
 
     const { email, password, passwordConfirmation } = req.body;
 
@@ -53,37 +65,34 @@ router.get('/signout', (req, res) => {
 
 // SIGNIN
 router.get('/signin', (req, res) => {
-  res.send(signinTemplate());
+  // pass empty {} or else it will give undefined error
+  res.send(signinTemplate({}));
 });
 
 // handle singin
-router.post('/signin', async (req, res) => {
-  const { email, password } = req.body;
+router.post(
+  '/signin',
+  [
+    requireEmailExists,
+    requireValidPasswordForUser
+  ],
+  async (req, res) => {
+    const errors = validationResult(req)
 
-  // check to see if existing user in DB
-  const user = await usersRepo.getOneBy({ email: email });
+    if (!errors.isEmpty()) {
+      return res.send(signinTemplate({ errors }))
+    }
 
-  // if user not found
-  if (!user) {
-    return res.send('Email not found!');
-  }
+    const { email } = req.body;
 
-  // hashed
-  const validPassword = await usersRepo.comparePasswords(
-    user.password,
-    password
-  )
+    // check to see if existing user in DB
+    const user = await usersRepo.getOneBy({ email });
 
-  // if we did find user check if passwords match
-  if (!validPassword) {
-    return res.send('Invalid Password');
-  }
+    // sign in if true
+    req.session.userId = user.id;
 
-  // sign in if true
-  req.session.userId = user.id;
-
-  res.send('You are signed in!!!');
-});
+    res.send('You are signed in!!!');
+  });
 
 
 
