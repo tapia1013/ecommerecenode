@@ -39,12 +39,7 @@ module.exports = class Repository {
 
 
   async getAll() {
-    // // Read its content
-    // // console.log(contents);
-    // // Parse the content
-    // const data = JSON.parse(contents);
-    // // return parsed data
-    // return data;
+
     return JSON.parse(await fs.promises.readFile(this.filename, {
       encoding: 'utf8'
     }));
@@ -109,8 +104,7 @@ module.exports = class Repository {
     if (!record) {
       throw new Error(`Record with id ${id} not found`)
     }
-    // record = {email: 'test@s.com'}
-    // attrs = {pw: 'mypw'}
+
     Object.assign(record, attrs) // record === {email, pw}
 
     await this.writeAll(records)
