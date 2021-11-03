@@ -9,7 +9,8 @@ const app = express();
 
 app.use(express.static('public'))
 // bodyparses everywhere in the app so we wont have to keep writing it
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true })); // depreciated
+express.urlencoded({ extended: true })
 // cookie session is a middleware so we have to app.use
 app.use(
   cookieSession({
