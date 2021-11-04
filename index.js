@@ -19,7 +19,7 @@ app.use(
 );
 
 app.use(authRouter);
-app.unsubscribe(productsRouter);
+app.use(productsRouter);
 
 
 app.listen(3000, () => {
