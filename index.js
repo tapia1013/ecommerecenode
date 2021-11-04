@@ -3,7 +3,9 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const authRouter = require('./routes/admin/auth');
 const adminProductsRouter = require('./routes/admin/products');
-const productsRouter = require('./routes/products')
+const productsRouter = require('./routes/products');
+const cartsRouter = require('./routes/carts');
+
 
 const app = express();
 
@@ -22,6 +24,7 @@ app.use(
 app.use(authRouter);
 app.use(productsRouter);
 app.use(adminProductsRouter);
+app.use(cartsRouter);
 
 
 
