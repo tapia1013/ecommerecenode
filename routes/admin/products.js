@@ -71,7 +71,12 @@ router.post(
   requireAuth,
   upload.single('image'),
   [requireTitle, requirePrice],
-  handleErrors(productsEditTemplate),
+  // 2nd argument helps with handleError bug
+  handleErrors(productsEditTemplate, async (req) => {
+    const product = await productsRepo.getOne(req.params.id);
+    // get {products} into our template
+    return { product };
+  }),
   async (req, res) => {
     const changes = req.body;
 
